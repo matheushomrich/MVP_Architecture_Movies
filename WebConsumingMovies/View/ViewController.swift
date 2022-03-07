@@ -9,6 +9,7 @@ import UIKit
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
+    private let moviePresenter: MoviePresenter = MoviePresenter()
     var moviesNowPlaying: [Movie] = []
     var moviesPopular: [Movie] = []
     
@@ -21,23 +22,26 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         tableView.dataSource = self
         tableView.delegate = self
-        
+        self.moviePresenter.view = self
+        self.configureRefresh()
         self.navigationItem.searchController = searchBar
-        
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
+        self.moviePresenter.fetchNowPlaying()
+        self.moviePresenter.fetchPopular()
         
-        TmdbAPI.shared.requestMoviesNowPlaying(completionHandler: { moviesNowPlaying in
-            self.moviesNowPlaying = moviesNowPlaying
         
-            TmdbAPI.shared.requestMoviesPopular { moviesPopular in
-                self.moviesPopular = moviesPopular
-            }
-            
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-        })
-        
+                
+    }
+    
+    private func configureRefresh() {
+        let refresh = UIRefreshControl()
+        refresh.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        self.tableView.refreshControl = refresh
+    }
+    
+    @objc func handleRefresh() {
+        moviePresenter.fetchPopular()
+        moviePresenter.fetchNowPlaying()
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -138,4 +142,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
     }
     
+}
+
+extension ViewController: MoviePresenterDelegate {
+    func fetchPopular(popularMovies: [Movie]) {
+        self.moviesPopular = popularMovies
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+    func fetchNowPlaying(playingMovies: [Movie]) {
+        self.moviesNowPlaying = playingMovies
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
 }
