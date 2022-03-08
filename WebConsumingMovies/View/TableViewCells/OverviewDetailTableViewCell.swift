@@ -8,7 +8,6 @@
 import UIKit
 
 class OverviewDetailTableViewCell: UITableViewCell {
-    
     @IBOutlet weak var overview: UILabel!
     @IBOutlet weak var overviewText: UILabel!
 }

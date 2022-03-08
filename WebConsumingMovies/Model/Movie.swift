@@ -7,18 +7,21 @@
 
 import UIKit
 
-struct Movie: CustomStringConvertible {
+struct MoviesResponse: Decodable, Equatable {
+    let movies: [Movies]?
+    let error: String?
     
-    let id: Int
-    let title: String
-    let image: String
-    let overview: String
-    let rating: Double
-    let genre_ids: [Int]
-    var genres: [String] = []
-    
-    var description: String {
-        return "\(title) is a(n) Movie with \(id) ID"
+    struct Movies: Decodable, Identifiable, Equatable {
+        let id: Int
+        let title: String
+        let image: String
+        let overview: String
+        let rating: Double
+        let genre_ids: [Int]
+        var genres: [String] = []
+        
+        var description: String {
+            return "\(title) is a(n) Movie with \(id) ID"
+        }
     }
 }
-

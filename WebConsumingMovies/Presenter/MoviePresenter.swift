@@ -9,19 +9,18 @@ import Foundation
 import UIKit
 
 protocol MoviePresenterDelegate: AnyObject {
-    func fetchNowPlaying(playingMovies: [Movie])
-    func fetchPopular(popularMovies: [Movie])
+    func fetchNowPlaying(playingMovies: [MoviesResponse.Movies])
+    func fetchPopular(popularMovies: [MoviesResponse.Movies])
     func fetchImage()
 }
 
 extension MoviePresenterDelegate {
-    func fetchNowPlaying(playingMovies: [Movie]) {}
-    func fetchPopular(popularMovies: [Movie]) {}
+    func fetchNowPlaying(playingMovies: [MoviesResponse.Movies]) {}
+    func fetchPopular(popularMovies: [MoviesResponse.Movies]) {}
     func fetchImage() {}
 }
 
 class MoviePresenter {
-    
     weak var view: (MoviePresenterDelegate & UIViewController)?
     
     init() {}
@@ -32,10 +31,12 @@ class MoviePresenter {
         })
     }
     
-    
     func fetchPopular() {
         TmdbAPI.shared.requestMoviesPopular(completionHandler: { result in
             self.view?.fetchPopular(popularMovies: result)
         })
+    }
+    
+    func fetchImage() {
     }
 }
