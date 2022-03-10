@@ -8,19 +8,16 @@
 import UIKit
 
 class DetailMovieViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
     @IBOutlet weak var tableView: UITableView!
     
-    var movie: Movie?
+    var movie: MoviesResponse.Movies?
         
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         tableView.delegate = self
         tableView.dataSource = self
         tableView.allowsSelection = false
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
-        
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -54,9 +51,6 @@ class DetailMovieViewController: UIViewController, UITableViewDataSource, UITabl
                 }
             }
             
-            
-            
-            
             let imageAttachment = NSTextAttachment()
             imageAttachment.image = UIImage(systemName: "star")
             imageAttachment.image = imageAttachment.image?.withTintColor(.lightGray)
@@ -77,5 +71,4 @@ class DetailMovieViewController: UIViewController, UITableViewDataSource, UITabl
             return cell
         }
     }
-    
 }

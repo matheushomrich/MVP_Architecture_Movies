@@ -6,20 +6,18 @@
 //
 
 import UIKit
+import Kingfisher
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
     private let moviePresenter: MoviePresenter = MoviePresenter()
-    var moviesNowPlaying: [Movie] = []
-    var moviesPopular: [Movie] = []
-    
+    var moviesNowPlaying: [MoviesResponse.Movies] = []
+    var moviesPopular: [MoviesResponse.Movies] = []
     var searchBar: UISearchController = UISearchController(searchResultsController: nil)
     
     @IBOutlet weak var tableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         tableView.dataSource = self
         tableView.delegate = self
         self.moviePresenter.view = self
@@ -28,9 +26,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.tableView.separatorStyle = UITableViewCell.SeparatorStyle.none
         self.moviePresenter.fetchNowPlaying()
         self.moviePresenter.fetchPopular()
-        
-        
-                
     }
     
     private func configureRefresh() {
@@ -57,14 +52,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         if section == 0 {
             return moviesNowPlaying.count
-            
         } else {
             return moviesPopular.count
         }
-        
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -75,19 +67,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             let movie = moviesPopular[indexPath.row]
             self.performSegue(withIdentifier: "detail-segue", sender: movie)
         }
-        
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "detail-segue" {
-            let movie = sender as? Movie
+            let movie = sender as? MoviesResponse.Movies
             let vc = segue.destination as? DetailMovieViewController
             vc!.movie = movie
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         if indexPath.section == 0 {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "movie-cell", for: indexPath) as? MovieTableViewCell else {
                 print("could not convert from cell to MovieTableViewCell")
@@ -98,9 +88,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             
             cell.poster.layer.cornerRadius = 16
             
-            TmdbAPI.shared.getImageFromAPI(urlString:movie.image, completionHandler: { image in
-                cell.poster.image = image
-            })
+            cell.poster.kf.setImage(with: URL(string: movie.image))
             cell.title.text = movie.title
             cell.overview.text = movie.overview
             
@@ -123,9 +111,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             
             cell.poster.layer.cornerRadius = 16
             
-            TmdbAPI.shared.getImageFromAPI(urlString:movie.image, completionHandler: { image in
-                cell.poster.image = image
-            })
+            cell.poster.kf.setImage(with: URL(string: movie.image))
             cell.title.text = movie.title
             cell.overview.text = movie.overview
             
@@ -138,21 +124,18 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             cell.rating.attributedText = fullString
             return cell
         }
-        
-        
     }
-    
 }
 
 extension ViewController: MoviePresenterDelegate {
-    func fetchPopular(popularMovies: [Movie]) {
+    func fetchPopular(popularMovies: [MoviesResponse.Movies]) {
         self.moviesPopular = popularMovies
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
     }
     
-    func fetchNowPlaying(playingMovies: [Movie]) {
+    func fetchNowPlaying(playingMovies: [MoviesResponse.Movies]) {
         self.moviesNowPlaying = playingMovies
         DispatchQueue.main.async {
             self.tableView.reloadData()
